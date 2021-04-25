@@ -37,6 +37,7 @@ public class TabuleiroConsole {
 				}
 			}
 		} catch (SairException e) {
+			System.out.println(tabuleiro);
 			System.out.println("Tchau!!!");
 		}finally {
 			sc.close();
@@ -52,7 +53,7 @@ public class TabuleiroConsole {
 				String digitado= capturarValorDigitado("Digite (linha,coluna): ");
 				Iterator<Integer> xy=Arrays.stream(digitado.split(",")).map(e -> Integer.parseInt(e.trim())).iterator();
 				//tirando a virgula e os espaços armazendo em um Array de String depois convertendo para int
-				digitado= capturarValorDigitado("1 - abrir ou 2 (DesMarcar ");
+				digitado= capturarValorDigitado("1 - abrir ou 2 (Des)Marcar: ");
 				
 				if("1".equals(digitado)) {
 					
@@ -66,6 +67,7 @@ public class TabuleiroConsole {
 			}
 			System.out.println("Você Ganhou!");
 		} catch (ExplosaoException e) {
+			System.out.println(tabuleiro);
 			System.out.println("Você Perdeu!");
 		}
 		
