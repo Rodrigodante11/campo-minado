@@ -1,5 +1,5 @@
 package modelo;
 
 public interface CampoObservador {
-	public void eventOocrreu(Campo campo, CampoEvento evento);
+	public void eventoOcorreu(Campo campo, CampoEvento evento);
 }

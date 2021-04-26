@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import excesao.ExplosaoException;
+
 
 public class CampoTeste {
 	private Campo campo;
@@ -96,14 +96,8 @@ public class CampoTeste {
 		campo.minar();
 		assertFalse(campo.abrir());
 	}
-	@Test
-	void testeabrirMinadoMNaoarcado() {
-		campo.minar();
-		
-		assertThrows(ExplosaoException.class,() ->{ //testar se lançou a exceção esperada
-			campo.abrir();
-		});
-	}
+	
+	
 	@Test
 	void testeabrirComVizinhos1() {
 		Campo campo11= new Campo(1,1);

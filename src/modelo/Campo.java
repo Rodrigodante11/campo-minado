@@ -3,75 +3,67 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Campo {
-	
+
 	private final int linha;
 	private final int coluna;
 	
-	
-	private boolean aberto=false;
-	private boolean minado=false;
+	private boolean aberto = false;
+	private boolean minado = false;
 	private boolean marcado = false;
 	
 	private List<Campo> vizinhos = new ArrayList<>();
 	private List<CampoObservador> observadores = new ArrayList<>();
 	
-	
-	Campo(int linha, int coluna){
-		this.linha=linha;
-		this.coluna=coluna;
+	Campo(int linha, int coluna) {
+		this.linha = linha;
+		this.coluna = coluna;
 	}
 	
-	public void registrarOservado(CampoObservador observador) {
+	public void registrarObservador(CampoObservador observador) {
 		observadores.add(observador);
 	}
 	
 	private void notificarObservadores(CampoEvento evento) {
-		observadores.stream().forEach(o -> o.eventOocrreu(this, evento));
+		observadores.stream()
+			.forEach(o -> o.eventoOcorreu(this, evento));
 	}
+	
 	boolean adicionarVizinho(Campo vizinho) {
-		
 		boolean linhaDiferente = linha != vizinho.linha;
-		boolean ColunaDiferente = coluna != vizinho.coluna;
-		boolean diagonal = linhaDiferente && ColunaDiferente;
+		boolean colunaDiferente = coluna != vizinho.coluna;
+		boolean diagonal = linhaDiferente && colunaDiferente;
 		
-		//as distancias em modulo
-		int deltaLinha= Math.abs(linha-vizinho.linha);
-		int deltaColuna = Math.abs(coluna-vizinho.coluna);
-		int deltaGeral =deltaLinha+deltaColuna;
+		int deltaLinha = Math.abs(linha - vizinho.linha);
+		int deltaColuna = Math.abs(coluna - vizinho.coluna);
+		int detalGeral = deltaColuna + deltaLinha;
 		
-		
-		//se delta geral= 1 e não esta na disgonal então é um vizinho
-		if(deltaGeral == 1 && !diagonal) {
+		if(detalGeral == 1 && !diagonal) {
 			vizinhos.add(vizinho);
 			return true;
-		}else if(deltaGeral ==2 && diagonal) {
+		} else if(detalGeral == 2 && diagonal) {
 			vizinhos.add(vizinho);
 			return true;
-		}else {
+		} else {
 			return false;
 		}
 	}
 	
-	//marcação para saber que é uma bomba
-	void alternarMarcacao() {
-		if(!aberto) {  // so altera se o campo tiver fechado, ou seja nao abrr para ver se tem bomba
-			marcado=!marcado;
+	public void alternarMarcacao() {
+		if(!aberto) {
+			marcado = !marcado;
 			
 			if(marcado) {
 				notificarObservadores(CampoEvento.MARCAR);
-			}else {
-				notificarObservadores(CampoEvento.DESMARCAR);
+			} else {
+				notificarObservadores(CampoEvento.DESMARCAR);			
 			}
 		}
 	}
 	
-	//abrir o campo para ver se tem bomba
-	boolean abrir() {
-		if(!aberto && !marcado) {
-			
-			
+	public boolean abrir() {
+		
+		if(!aberto && !marcado) {			
 			if(minado) {
 				notificarObservadores(CampoEvento.EXPLODIR);
 				return true;
@@ -80,41 +72,43 @@ public class Campo {
 			setAberto(true);
 			
 			if(vizinhancaSegura()) {
-				vizinhos.forEach(v -> v.abrir()); //recursivo
+				vizinhos.forEach(v -> v.abrir());
 			}
+			
 			return true;
-		}else {
-		
-		return false;
+		} else {
+			return false;			
 		}
 	}
 	
-	boolean vizinhancaSegura() {
-		
+	public boolean vizinhancaSegura() {
 		return vizinhos.stream().noneMatch(v -> v.minado);
 	}
 	
 	void minar() {
-			minado = true;
-				
+		minado = true;
 	}
+	
 	public boolean isMinado() {
 		return minado;
 	}
+	
 	public boolean isMarcado() {
 		return marcado;
 	}
 	
-	 void setAberto(boolean aberto) {
-		this.aberto=aberto;
+	void setAberto(boolean aberto) {
+		this.aberto = aberto;
 		
 		if(aberto) {
 			notificarObservadores(CampoEvento.ABRIR);
 		}
 	}
+
 	public boolean isAberto() {
 		return aberto;
 	}
+
 	public boolean isFechado() {
 		return !isAberto();
 	}
@@ -122,28 +116,25 @@ public class Campo {
 	public int getLinha() {
 		return linha;
 	}
-	
+
 	public int getColuna() {
 		return coluna;
 	}
 	
 	boolean objetivoAlcancado() {
 		boolean desvendado = !minado && aberto;
-		boolean protegido= minado && marcado;
-		
+		boolean protegido = minado && marcado;
 		return desvendado || protegido;
 	}
 	
-	long minasNaVizinhanca() {
-		return vizinhos.stream().filter(v-> v.minado).count();
+	public int minasNaVizinhanca() {
+		return (int) vizinhos.stream().filter(v -> v.minado).count();
 	}
 	
 	void reiniciar() {
-		aberto =false;
-		minado=false;
-		marcado=false;
+		aberto = false;
+		minado = false;
+		marcado = false;
+		notificarObservadores(CampoEvento.REINICIAR);
 	}
-	
-	
-	
 }
