@@ -3,7 +3,6 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-import excesao.ExplosaoException;
 
 public class Campo {
 	
@@ -15,13 +14,22 @@ public class Campo {
 	private boolean minado=false;
 	private boolean marcado = false;
 	
-	private  List<Campo> vizinhos = new ArrayList<>();
+	private List<Campo> vizinhos = new ArrayList<>();
+	private List<CampoObservador> observadores = new ArrayList<>();
+	
 	
 	Campo(int linha, int coluna){
 		this.linha=linha;
 		this.coluna=coluna;
 	}
 	
+	public void registrarOservado(CampoObservador observador) {
+		observadores.add(observador);
+	}
+	
+	private void notificarObservadores(CampoEvento evento) {
+		observadores.stream().forEach(o -> o.eventOocrreu(this, evento));
+	}
 	boolean adicionarVizinho(Campo vizinho) {
 		
 		boolean linhaDiferente = linha != vizinho.linha;
@@ -50,17 +58,26 @@ public class Campo {
 	void alternarMarcacao() {
 		if(!aberto) {  // so altera se o campo tiver fechado, ou seja nao abrr para ver se tem bomba
 			marcado=!marcado;
+			
+			if(marcado) {
+				notificarObservadores(CampoEvento.MARCAR);
+			}else {
+				notificarObservadores(CampoEvento.DESMARCAR);
+			}
 		}
 	}
 	
 	//abrir o campo para ver se tem bomba
 	boolean abrir() {
 		if(!aberto && !marcado) {
-			aberto =true;
+			
 			
 			if(minado) {
-				throw new ExplosaoException();
+				notificarObservadores(CampoEvento.EXPLODIR);
+				return true;
 			}
+			
+			setAberto(true);
 			
 			if(vizinhancaSegura()) {
 				vizinhos.forEach(v -> v.abrir()); //recursivo
@@ -90,6 +107,10 @@ public class Campo {
 	
 	 void setAberto(boolean aberto) {
 		this.aberto=aberto;
+		
+		if(aberto) {
+			notificarObservadores(CampoEvento.ABRIR);
+		}
 	}
 	public boolean isAberto() {
 		return aberto;
@@ -123,18 +144,6 @@ public class Campo {
 		marcado=false;
 	}
 	
-	public String toString(){
-		if(marcado) {
-			return "x";
-		}else if(aberto && minado) {
-			return "*";
-		}else if(aberto && minasNaVizinhanca()>0) {
-			return Long.toString(minasNaVizinhanca());
-		}else if(aberto) {
-			return " ";
-		}else {
-			return "?";
-		}
-	}
+	
 	
 }

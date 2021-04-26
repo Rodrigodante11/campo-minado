@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import excesao.ExplosaoException;
 
 public class Tabuleiro {
 	private int linhas;
@@ -12,6 +11,8 @@ public class Tabuleiro {
 	private int minas;
 	
 	private final List<Campo> campos = new ArrayList<>();
+	
+	
 
 	public Tabuleiro(int linhas, int colunas, int minas) {
 		
@@ -29,7 +30,7 @@ public class Tabuleiro {
 			      .filter(c -> c.getLinha() ==linha && c.getColuna() == coluna)
 			      .findFirst()
 			      .ifPresent(c->c.abrir());
-		} catch (ExplosaoException e) {
+		} catch ( Exception e) {
 			campos.forEach(c -> c.setAberto(true));
 			throw e;
 		}
@@ -85,30 +86,7 @@ public class Tabuleiro {
 		sortearMinas();
 	}
 	
-	public String toString() {
-		StringBuilder sb= new StringBuilder();
-		sb.append("  ");
-		for(int c =0; c<colunas;c++) {
-			sb.append(" ");
-			sb.append(c);
-			sb.append(" ");
-		}
-		sb.append("\n-------------------\n");
-		int cont=0;
-		for(int i=0;i<linhas;i++) {
-			sb.append(i);
-			sb.append("|");
-			for(int j=0;j<colunas;j++)
-			{
-				sb.append(" ");
-				sb.append(campos.get(cont));
-				sb.append(" ");
-				cont++;
-			}
-			sb.append("\n");
-		}
-		return sb.toString();
-	}
+	
 	
 	
 }
